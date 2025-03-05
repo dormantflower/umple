@@ -3,10 +3,10 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - main  # 你可以改成你的默认分支
+      - master  # 你可以改成你的默认分支
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   sonar:
