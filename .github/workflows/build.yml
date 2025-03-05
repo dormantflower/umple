@@ -1,38 +1,19 @@
-name: SonarCloud Analysis
-
+name: Build
 on:
   push:
     branches:
-      - master  # 你可以改成你的默认分支
-  pull_request:
-    branches:
       - master
-
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
-  sonar:
-    name: SonarCloud Scan
+  sonarqube:
+    name: SonarQube
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y cmake build-essential bear
-
-      - name: Configure CMake & Generate compile_commands.json
-        run: cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -B build
-
-      - name: Copy compile_commands.json to root (optional)
-        run: cp build/compile_commands.json .
-
-      - name: Run SonarCloud Scan
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          sonar-scanner \
-            -Dsonar.projectKey=你的_SonarCloud_项目Key \
-            -Dsonar.organization=你的_SonarCloud_组织ID \
-            -Dsonar.cfamily.compile-commands=build/compile_commands.json \
-            -Dsonar.sources=. \
-            -Dsonar.host.url=https://sonarcloud.io
