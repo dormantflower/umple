@@ -1,33 +1,19 @@
-name: SonarCloud Analysis
-
+name: Build
 on:
   push:
     branches:
       - master
-
+  pull_request:
+    types: [opened, synchronize, reopened]
 jobs:
-  build:
+  sonarqube:
+    name: SonarQube
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up JDK 11
-        uses: actions/setup-java@v2
+      - uses: actions/checkout@v4
         with:
-          distribution: 'adoptopenjdk' 
-          java-version: '11'
-
-      - name: Compile Java code
-        run: javac -d build/classes $(find . -name "*.java")
-
-      - name: Run SonarCloud scan
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@v5
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          sonar-scanner \
-            -Dsonar.projectKey=你的_SonarCloud_项目Key \
-            -Dsonar.organization=你的_SonarCloud_组织ID \
-            -Dsonar.sources=. \
-            -Dsonar.java.binaries=build/classes \
-            -Dsonar.host.url=https://sonarcloud.io
